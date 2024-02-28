@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef } from 'react'
 import Pages from './components/Pages'
 import { getIDs } from './utils/api'
 import { useContext } from 'react'
@@ -6,12 +6,13 @@ import { ProductsContext } from './context/products'
 
 function App() {
   const { setIDs, setSortedIDs } = useContext(ProductsContext)
+  const abortController = useRef(new AbortController())
 
   useEffect(() => {
-    console.log('useeffect')
     const fetchData = async () => {
       try {
-        const result = await getIDs()
+        const { signal } = abortController.current
+        const result = await getIDs(signal)
         setIDs(result.result)
         setSortedIDs(result.result)
       } catch (error) {
@@ -19,6 +20,9 @@ function App() {
       }
     }
     fetchData()
+    return () => {
+      abortController.current.abort('Request was canceled❤️')
+    }
   }, [])
 
   return (

@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react'
+import React, { useState, useRef } from 'react'
 import { useEffect } from 'react'
 import { getProductInfo } from '../utils/api'
 import Spinner from 'react-bootstrap/Spinner'
@@ -6,17 +6,22 @@ import Card from 'react-bootstrap/Card'
 
 const Product = ({ id }) => {
   const [info, setInfo] = useState(null)
+  const abortController = useRef(new AbortController())
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await getProductInfo(id)
-        setInfo(response.result[0])
+        const { signal } = abortController.current
+        const response = await getProductInfo(id, signal)
+        setInfo(response?.result[0])
       } catch (error) {
         console.error(error)
       }
     }
     fetchData()
+    return () => {
+      abortController.current.abort('Request was canceled❤️')
+    }
   }, [])
   return (
     <>

@@ -18,12 +18,17 @@ const getHeaders = (additionalHeaders = {}) => {
   }
 }
 
-const handleFetchWithRetry = async (url, requestOptions, maxRetries = 3) => {
+const handleFetchWithRetry = async (
+  url,
+  requestOptions,
+  maxRetries = 3,
+  signal
+) => {
   let retries = 0
 
   const attemptFetch = async () => {
     try {
-      const response = await fetch(url, requestOptions)
+      const response = await fetch(url, { ...requestOptions, signal })
 
       if (!response.ok) {
         throw new Error('Authorization failed')
@@ -47,7 +52,7 @@ const handleFetchWithRetry = async (url, requestOptions, maxRetries = 3) => {
   return attemptFetch()
 }
 
-export const getIDs = async (url = apiUrl) => {
+export const getIDs = async (signal) => {
   const requestOptions = {
     method: 'POST',
     headers: getHeaders(),
@@ -61,17 +66,17 @@ export const getIDs = async (url = apiUrl) => {
   }
 
   try {
-    return await handleFetchWithRetry(url, requestOptions)
+    const url = 'https://api.valantis.store:41000/'
+    return await handleFetchWithRetry(url, requestOptions, 3, signal)
   } catch (error) {
     console.error('Failed to fetch IDs:', error)
   }
 }
 
-export const getProductInfo = async (id, url = apiUrl) => {
+export const getProductInfo = async (id, signal) => {
   const requestOptions = {
     method: 'POST',
     headers: getHeaders(),
-
     body: JSON.stringify({
       action: 'get_items',
       params: {
@@ -81,12 +86,12 @@ export const getProductInfo = async (id, url = apiUrl) => {
   }
 
   try {
-    return await handleFetchWithRetry(url, requestOptions)
+    return await handleFetchWithRetry(apiUrl, requestOptions, 3, signal)
   } catch (error) {
     console.error('Failed to fetch info:', error)
   }
 }
-export const getSortedProducts = async (props, url = apiUrl) => {
+export const getSortedProducts = async (props, signal) => {
   const requestOptions = {
     method: 'POST',
     headers: getHeaders(),
@@ -94,10 +99,12 @@ export const getSortedProducts = async (props, url = apiUrl) => {
       action: 'filter',
       params: props,
     }),
+    signal: signal,
   }
 
   try {
-    return await handleFetchWithRetry(url, requestOptions)
+    const url = 'https://api.valantis.store:41000/'
+    return await handleFetchWithRetry(url, requestOptions, 3, signal)
   } catch (error) {
     console.error('Failed to fetch sortedIDs:', error)
   }

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useRef, useState, useEffect } from 'react'
 import Dropdown from 'react-bootstrap/Dropdown'
 import Form from 'react-bootstrap/Form'
 import InputGroup from 'react-bootstrap/InputGroup'
@@ -14,12 +14,13 @@ const splitButtonTitle = {
   price: 'Цена',
   brand: 'Брэнд',
 }
-console.log()
+
 export default function Filter() {
   const [activeInput, setActiveInput] = useState('')
   const [inputValue, setInputValue] = useState('')
   const [showMessage, setShowMessage] = useState(false)
   const { IDs, sortedIDs, setSortedIDs } = useContext(ProductsContext)
+  const abortController = useRef(new AbortController())
   const opacityValue = sortedIDs.length > 1 ? 0 : 1
 
   const handleChangeInput = (e) => {
@@ -38,12 +39,18 @@ export default function Filter() {
 
     const parsedValue = name === 'price' ? +value : value
     try {
-      const sortedIDs = await getSortedProducts({ [name]: parsedValue })
+      const { signal } = abortController.current
+      const sortedIDs = await getSortedProducts({ [name]: parsedValue }, signal)
       setSortedIDs(sortedIDs.result)
     } catch (error) {
       console.error('Error fetching sorted IDs:', error)
     }
   }
+  useEffect(() => {
+    return () => {
+      abortController.current.abort('Request was canceled❤️')
+    }
+  }, [])
   return (
     <Stack>
       <InputGroup className="mb-3">
