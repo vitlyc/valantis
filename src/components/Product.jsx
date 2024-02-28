@@ -18,7 +18,6 @@ const Product = ({ id }) => {
     }
     fetchData()
   }, [])
-
   return (
     <>
       <Card

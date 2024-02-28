@@ -10,7 +10,7 @@ import Col from 'react-bootstrap/Col'
 
 export default function Pages() {
   const [currentPage, setCurrentPage] = useState(1)
-  const [itemsPerPage] = useState(1)
+  const [itemsPerPage] = useState(6)
   const { sortedIDs } = useContext(ProductsContext)
 
   const totalPages = []
