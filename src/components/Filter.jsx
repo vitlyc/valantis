@@ -14,6 +14,7 @@ const splitButtonTitle = {
   price: 'Цена',
   brand: 'Брэнд',
 }
+console.log()
 export default function Filter() {
   const [activeInput, setActiveInput] = useState('')
   const [inputValue, setInputValue] = useState('')
